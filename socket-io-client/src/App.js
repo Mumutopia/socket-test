@@ -1,40 +1,31 @@
 import React, { useState, useEffect } from "react";
 import socketIOClient from "socket.io-client";
-const ENDPOINT = "http://127.0.0.1:4001";
+
+const ENDPOINT = "http://localhost:4001";
+const socket = socketIOClient(ENDPOINT); // c'est ton objeytt de transport vers server
 
 function App() {
-  const [response, setResponse] = useState(0);
+  const [count, setCount] = useState(0);
+  const [result, setResult] = useState(null);
 
- let result;
-
-  
-  useEffect(() => {
-    const socket = socketIOClient(ENDPOINT);
-    socket.emit("click", response);
-
-    socket.on('click', function(msg) {
-      
-      result=msg;
-      
-      
-    });
-
-  },);
+  const handleClick = (evt) => {
+    setCount(count + 1)
+    socket.emit("clientTalks", count)
+  }
 
   // useEffect(() => {
-  //   const socket = socketIOClient(ENDPOINT);
-  //   socket.on("click", data => {
-  //     setResponse(data);
-  //   });
+    socket.on("serverReponded", message => {
+      setResult(message);
+    });
   // }, []);
 
   return (
     <>
     <p>
-      <button onClick={() => setResponse(response +1)} >incremente {response}</button>
+      <button onClick={handleClick} >incremente {count}</button>
     </p>
     <div>
-     result = {result}
+     result = {JSON.stringify(result)}
 
     </div>
     </>
